@@ -1,0 +1,74 @@
+fetch("https://web-standards.ru/calendar.json")
+    .then(response => response.json())
+    .then(json => renderPosts(json));
+
+
+var byCity = document.querySelector('.byCity')
+var inpByName = document.querySelector('.byName')
+
+function renderPosts(data) {
+    byCity.addEventListener('change', function () {
+        create(data.reverse())
+    })
+    create(data.reverse())
+}
+
+function create(data) {
+    var dataElms = data.filter(elm => {
+        if (byCity.value !== "") {
+            return elm.location = byCity.value;
+            // } else if (elm.location !== elm.value) {
+            //     elm.style.display = 'none'
+        }
+    });
+    var techCheckbox = document.querySelectorAll('.techBtns input')
+    techCheckbox.forEach(elm => {
+        var getAttr = elm.getAttribute('data-tech')
+        elm.addEventListener("input", function () {
+            if (elm.checked) {
+                showSelected(getAttr)
+            }
+        });
+    });
+
+    function showSelected(attr) {
+        var dataElms = data.filter(
+            elm => elm.summary = attr || attr == "*" ? elm : ""
+        );
+        dataElms.forEach(elm => {
+            var eventDiv = document.createElement('div')
+            var container = document.querySelector('.container')
+            eventDiv.classList.add('event')
+            eventDiv.innerHTML = ` <p>Event name: ${elm.summary}</p>
+                            <p>Date start: ${elm.start}</p>
+                            <p>Date end: ${elm.end}</p>
+                            <p>Location: ${elm.location}</p>
+                            <p>Description: <a href = "${elm.description}" >${elm.summary}</a></p>
+                            `;
+            var date = new Date().toJSON().slice(0, 10).replace(/-/g, '-');
+            if (date > elm.start) {
+                eventDiv.classList.add('innactive')
+            }
+            container.appendChild(eventDiv)
+        });
+    }
+
+    dataElms.forEach(elm => {
+        var eventDiv = document.createElement('div')
+        var container = document.querySelector('.container')
+        eventDiv.classList.add('event')
+        eventDiv.innerHTML = ` <p>Event name: ${elm.summary}</p>
+                        <p>Date start: ${elm.start}</p>
+                        <p>Date end: ${elm.end}</p>
+                        <p>Location: ${elm.location}</p>
+                        <p>Description: <a href = "${elm.description}" >${elm.summary}</a></p>
+                        `;
+        var date = new Date().toJSON().slice(0, 10).replace(/-/g, '-');
+        if (date > elm.start) {
+            eventDiv.classList.add('innactive')
+        }
+        container.appendChild(eventDiv)
+    });
+
+
+}

@@ -1,0 +1,59 @@
+fetch("https://web-standards.ru/calendar.json")
+    .then(response => response.json())
+    .then(json => renderPosts(json));
+
+
+var byCity = document.querySelector('.byCity')
+var inpByName = document.querySelector('.byName')
+var container = document.querySelector('.container')
+var techCheckbox = document.querySelectorAll('.techBtns input')
+var dataElms = [];
+
+function renderPosts(data) {
+    byCity.addEventListener('change', function () {
+        create(data)
+    })
+}
+
+function searchElms() {
+    dataElms = data.filter(elm => {
+        if (byCity.value !== "") {
+            return elm.location == byCity.value;
+        }
+    });
+
+    techCheckbox.forEach(elm => {
+        var getAttr = elm.getAttribute('data-tech')
+        elm.addEventListener("input", function () {
+            if (elm.checked) {
+                showSelected(getAttr)
+            } else {
+                container.innerHTML = ''
+            }
+        });
+    });
+}
+
+function showSelected(attr) {
+    var myPattern = new RegExp('(\\w*' + attr + '\\w*)', 'gi');
+    dataElms = data.filter(elm => elm.summary.match(myPattern));
+    create(dataElms)
+}
+
+function create(dataElmsArr) {
+    dataElmsArr.forEach(elm => {
+        var eventDiv = document.createElement('div')
+        eventDiv.classList.add('event')
+        eventDiv.innerHTML = ` <p>Event name: ${elm.summary}</p>
+                        <p>Date start: ${elm.start}</p>
+                        <p>Date end: ${elm.end}</p>
+                        <p>Location: ${elm.location}</p>
+                        <p>Description: <a href = "${elm.description}" >${elm.summary}</a></p>
+                        `;
+        var date = new Date().toJSON().slice(0, 10).replace(/-/g, '-');
+        if (date > elm.start) {
+            eventDiv.classList.add('innactive')
+        }
+        container.appendChild(eventDiv)
+    });
+}
